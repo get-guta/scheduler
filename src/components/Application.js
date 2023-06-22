@@ -1,8 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 import "components/Application.scss";
+import DayList from "components/DayList";
+import Appointment from "components/Appointment";
+import { getAppointmentsForDay, getInterview } from "./helper/selectors";
 
 export default function Application(props) {
+  const [state, setState] = useState({
+    day: "Monday",
+    days: [],
+    appointments: {},
+    interviewers: {}
+  });
+
+  const dailyAppointments = getAppointmentsForDay(state, state.day);
+
+  const setDay = (day) => {
+    setState((prev) => ({ ...prev, day }));
+  };
+
+  useEffect(() => {
+    Promise.all([
+      axios.get("http://localhost:8001/api/days"),
+      axios.get("http://localhost:8001/api/appointments"),
+      axios.get("http://localhost:8001/api/interviewers")
+    ]).then((all) => {
+      const [daysResponse, dailyAppointments, interviewersResponse] = all;
+      setState((prev) => ({
+        ...prev,
+        days: daysResponse.data,
+        appointments: dailyAppointments.data,
+        interviewers: interviewersResponse.data
+      }));
+    });
+  }, []);
+
+  // Move the schedule mapping outside of the JSX block
+  const schedule = dailyAppointments.map((appointment) => {
+    const interview = getInterview(state, appointment.interview);
+    return (
+      <Appointment
+        key={appointment.id}
+        id={appointment.id}
+        time={appointment.time}
+        interview={interview}
+      />
+    );
+  });
+
   return (
     <main className="layout">
       <section className="sidebar">
@@ -12,7 +58,9 @@ export default function Application(props) {
           alt="Interview Scheduler"
         />
         <hr className="sidebar__separator sidebar--centered" />
-        <nav className="sidebar__menu"></nav>
+        <nav className="sidebar__menu">
+          <DayList days={state.days} value={state.day} onChange={setDay} />
+        </nav>
         <img
           className="sidebar__lhl sidebar--centered"
           src="images/lhl.png"
@@ -20,10 +68,9 @@ export default function Application(props) {
         />
       </section>
       <section className="schedule">
-        {/* Replace this with the schedule elements durint the "The Scheduler" activity. */}
+        {schedule}
+        <Appointment key="last" time="5pm" />
       </section>
     </main>
   );
 }
-
-
