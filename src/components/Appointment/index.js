@@ -12,6 +12,7 @@ export default function Appointment(props) {
   const SHOW = "SHOW";
   const CREATE = "CREATE";
   const SAVING = "SAVING";
+  const DELETING = "DELETING";
 
   const { mode, transition, back } = useVisualMode(
     props.interview ? SHOW : EMPTY
@@ -33,6 +34,19 @@ export default function Appointment(props) {
       });
 
   }
+  function cancel() {
+    
+    transition(DELETING); // Transition to SAVING mode before calling bookInterview
+
+    props.cancelInterview(props.id)
+      .then(() => {
+        transition(EMPTY); // Transition to EMPTY mode when the request is complete
+      })
+      .catch((error) => {
+        console.error(error);
+        // Handle error if the request fails
+      });
+  }
 
   return (
     <>
@@ -43,6 +57,7 @@ export default function Appointment(props) {
           <Show
             student={props.interview.student}
             interviewer={props.interview.interviewer}
+            onDelete={cancel}
           />
         )}
         {mode === CREATE && (<Form
@@ -51,6 +66,7 @@ export default function Appointment(props) {
           onCancel={() => back(EMPTY)}
         />)}
         {mode === SAVING && <Status message="Saving" />}
+        {mode === DELETING && <Status message="Deleting" />}
 
       </article>
 

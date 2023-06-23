@@ -42,17 +42,62 @@ export default function Application(props) {
       ...state.appointments[id],
       interview: { ...interview }
     };
-
+  
     const appointments = {
       ...state.appointments,
       [id]: appointment
     };
-
-    setState({
-      ...state,
-      appointments
-    });
+  
+    // Return the promise
+    return axios.put(`http://localhost:8001/api/appointments/${id}`, { interview })
+      .then((response) => {
+        if (response.status === 204) {
+          // Update the state with the updated appointment data
+          setState({
+            ...state,
+            appointments
+          });
+          return true;
+        } else {
+          throw new Error('Failed to update appointment');
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        // Handle error if the request fails
+        throw error; // Propagate the error to the caller
+      });
   }
+
+  function cancelInterview(id) {
+    // Make the put request using Axios
+    return axios.delete(`http://localhost:8001/api/appointments/${id}`)
+      .then((response) => {
+        if (response.status === 204) {
+          // Update the state with the cancelled appointment data
+          setState(prev => ({
+            ...prev,
+            appointments: {
+              ...prev.appointments,
+              [id]: {
+                ...prev.appointments[id],
+                interview: null
+              }
+            }
+          }));
+          
+          return true;
+        } else {
+          throw new Error('Failed to cancel appointment');
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        // Handle error if the request fails
+      });
+  }
+
+  
 
   // Move the schedule mapping outside of the JSX block
   const schedule = dailyAppointments.map((appointment) => {
@@ -66,6 +111,7 @@ export default function Application(props) {
         interview={interview}
         interviewers={interviewers}
         bookInterview={bookInterview}
+        cancelInterview={cancelInterview}
       />
     );
   });
