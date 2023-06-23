@@ -50,10 +50,20 @@ export default function useApplicationData() {
       .then((response) => {
         if (response.status === 204) {
           // Update the state with the updated appointment data
-          setState((prev) => ({
-            ...prev,
-            appointments
-          }));
+          setState((prev) => {
+            const updatedAppointments = {
+              ...prev.appointments,
+              [id]: appointment
+            };
+
+            const updatedDays = updateSpotsRemaining(prev.days, updatedAppointments);
+
+            return {
+              ...prev,
+              appointments: updatedAppointments,
+              days: updatedDays
+            };
+          });
           return true;
         } else {
           throw new Error("Failed to update appointment");
@@ -73,16 +83,23 @@ export default function useApplicationData() {
       .then((response) => {
         if (response.status === 204) {
           // Update the state with the cancelled appointment data
-          setState((prev) => ({
-            ...prev,
-            appointments: {
+          setState((prev) => {
+            const updatedAppointments = {
               ...prev.appointments,
               [id]: {
                 ...prev.appointments[id],
                 interview: null
               }
-            }
-          }));
+            };
+
+            const updatedDays = updateSpotsRemaining(prev.days, updatedAppointments);
+
+            return {
+              ...prev,
+              appointments: updatedAppointments,
+              days: updatedDays
+            };
+          });
 
           return true;
         } else {
@@ -94,6 +111,22 @@ export default function useApplicationData() {
         // Handle error if the request fails
         throw error; // Propagate the error to the caller
       });
+  }
+
+  function updateSpotsRemaining(days, appointments) {
+    return days.map((day) => {
+      const spots = day.appointments.reduce((count, appointmentId) => {
+        if (!appointments[appointmentId].interview) {
+          return count + 1;
+        }
+        return count;
+      }, 0);
+
+      return {
+        ...day,
+        spots
+      };
+    });
   }
 
   const interviewers = getInterviewersForDay(state, state.day);
