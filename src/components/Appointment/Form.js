@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import InterviewerList from "components/InterviewerList";
-import InterviewerListItem from 'components/InterviewerListItem';
 import Button from "components/Button";
 
 export default function Form(props) {
@@ -30,6 +29,7 @@ export default function Form(props) {
             placeholder="Enter Student Name"
             value={student}
             onChange={(event)=> setStudent(event.target.value)}  
+            data-testid="student-name-input"
           />
         </form>
         <InterviewerList
