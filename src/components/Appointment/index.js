@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import "./styles.scss";
 import Header from "./Header";
 import Show from "./Show";
@@ -23,13 +23,13 @@ export default function Appointment(props) {
     props.interview ? SHOW : EMPTY
   );
   useEffect(() => {
-    if (interview && mode === EMPTY) {
+    if (props.interview && mode === EMPTY) {
      transition(SHOW);
     }
-    if (interview === null && mode === SHOW) {
+    if (props.interview === null && mode === SHOW) {
      transition(EMPTY);
     }
-   }, [interview, transition, mode]);
+   }, [props.interview, transition, mode]);
   function save(name, interviewer) {
     const interview = {
       student: name,
