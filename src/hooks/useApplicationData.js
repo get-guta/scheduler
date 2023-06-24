@@ -16,6 +16,35 @@ export default function useApplicationData() {
   const setDay = (day) => {
     setState((prev) => ({ ...prev, day }));
   };
+  useEffect(() => {
+    const webSocket = new WebSocket("ws://localhost:8001/api/ws");
+
+    webSocket.addEventListener('open', () => {
+    // Send "ping" to the server when the connection is open
+    webSocket.send('ping');
+  });
+    webSocket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    webSocket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      // Handle incoming WebSocket messages
+      // Update the state accordingly
+      // For example:
+      if (data.type === "appointments") {
+        setState((prev) => ({
+          ...prev,
+          appointments: data.appointments
+        }));
+      }
+    };
+
+    // Clean up the WebSocket connection when the component unmounts
+    return () => {
+      webSocket.close();
+    };
+  }, []); // Empty dependency array ensures the effect runs only once
 
   useEffect(() => {
     Promise.all([
