@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+const { useState, useEffect } = require("react");
 import axios from "axios";
-
 import {
   getAppointmentsForDay,
   getInterviewersForDay
