@@ -103,7 +103,6 @@ export default function useApplicationData() {
         }
       })
       .catch((error) => {
-        console.error(error);
         // Handle error if the request fails
         throw error; // Propagate the error to the caller
       });
@@ -140,7 +139,6 @@ export default function useApplicationData() {
         }
       })
       .catch((error) => {
-        console.error(error);
         // Handle error if the request fails
         throw error; // Propagate the error to the caller
       });
