@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from 'axios';
 import {
   getAppointmentsForDay,
   getInterviewersForDay
@@ -16,13 +16,16 @@ export default function useApplicationData() {
   const setDay = (day) => {
     setState((prev) => ({ ...prev, day }));
   };
+
   useEffect(() => {
+    // Establish a WebSocket connection
     const webSocket = new WebSocket("ws://localhost:8001/api/ws");
 
     webSocket.addEventListener('open', () => {
-    // Send "ping" to the server when the connection is open
-    webSocket.send('ping');
-  });
+      // Send "ping" to the server when the connection is open
+      webSocket.send('ping');
+    });
+
     webSocket.onopen = () => {
       console.log("WebSocket connection established");
     };
@@ -31,7 +34,7 @@ export default function useApplicationData() {
       const data = JSON.parse(event.data);
       // Handle incoming WebSocket messages
       // Update the state accordingly
-      // For example:
+      // For example, update appointments if the message type is "appointments"
       if (data.type === "appointments") {
         setState((prev) => ({
           ...prev,
@@ -47,6 +50,7 @@ export default function useApplicationData() {
   }, []); // Empty dependency array ensures the effect runs only once
 
   useEffect(() => {
+    // Fetch initial data from the API endpoints
     Promise.all([
       axios.get("http://localhost:8001/api/days"),
       axios.get("http://localhost:8001/api/appointments"),
@@ -158,6 +162,7 @@ export default function useApplicationData() {
     });
   }
 
+  // Retrieve interviewers and daily appointments for the current day
   const interviewers = getInterviewersForDay(state, state.day);
   const dailyAppointments = getAppointmentsForDay(state, state.day);
 
