@@ -83,5 +83,22 @@ export default {
         });
       }
     });
+  }),
+  put: jest.fn((url, data) => {
+    return new Promise((resolve, reject) => {
+      if (url.includes("http://localhost:8001/api/appointments")) {
+        resolve({
+          status: 204,
+          statusText: "No Content"
+        });
+      } else {
+        console.log(url);
+        reject({
+          status: 404,
+          statusText: "Not Found",
+          data: "API Endpoint not found"
+        });
+      }
+    });
   })
 }
