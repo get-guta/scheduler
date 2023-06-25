@@ -93,7 +93,6 @@ describe("Application", () => {
     // 8. Check that the DayListItem with the text "Monday" also has the text "2 spots remaining".
     const day = getAllByTestId(container, "day").find(day => queryByText(day, "Monday"));
     expect(getByText(day, "2 spots remaining")).toBeInTheDocument();
-    debug();
   });
  
   it("loads data, edits an interview and keeps the spots remaining for Monday the same", async () => {
